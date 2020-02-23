@@ -27,15 +27,5 @@ RUN mkdir -p /mitlm/bin && \
     cp /build/bin/* /mitlm/bin/ && \
     cp /build/lib/*.so* /mitlm/lib/
 
-# Copy all lib dependencies
-RUN for lib_file in /mitlm/lib/*; do \
-    ldd $lib_file | grep '=> /' | awk '{ print $3 }' | xargs -n1 -I {} cp -vL '{}' /mitlm/lib/; \
-    done
-
-# Copy all binary dependencies
-RUN for bin_file in /mitlm/bin/*; do \
-    ldd $bin_file | grep '=> /' | awk '{ print $3 }' | xargs -n1 -I {} cp -vL '{}' /mitlm/lib/; \
-    done
-
-# Delete libc
-RUN rm /mitlm/lib/libc.so*
+# Copy dependencies
+RUN ldd /mitlm/bin/* /mitlm/lib/*.so* | grep '=> /' | grep 'libgfortran' | awk '{ print $3 }' | xargs -n1 -I {} cp -vL '{}' /mitlm/lib/
