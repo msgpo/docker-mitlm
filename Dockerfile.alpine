@@ -6,9 +6,11 @@ ARG MAKE_THREADS=8
 COPY etc/qemu-arm-static /usr/bin/
 COPY etc/qemu-aarch64-static /usr/bin/
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
+
+RUN apk update && \
+    apk add --no-cache \
+        build-base \
         automake autoconf-archive gfortran libtool
 
 COPY download/mitlm-0.4.2-long.tar.gz /
