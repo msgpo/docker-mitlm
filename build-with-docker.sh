@@ -35,22 +35,24 @@ for docker_arch in "${docker_archs[@]}"; do
     fi
 
     mkdir -p "${this_dir}/dist"
+    docker_tag="rhasspy/mitlm:0.4.2-${friendly_arch}"
 
-    # Debian build (skip arm32v6)
-    if [[ "${friendly_arch}" != 'arm32v6' ]]; then
-        docker_tag="rhasspy/mitlm:0.4.2-${friendly_arch}"
-
+    if [[ "${friendly_arch}" == 'arm32v6' ]]; then
+        docker build "${this_dir}" \
+               --build-arg "BUILD_FROM=balenalib/raspberry-pi-debian:buster-build" \
+               -t "${docker_tag}"
+    else
         docker build "${this_dir}" \
                --build-arg "BUILD_FROM=${docker_arch}/debian:stretch" \
                -t "${docker_tag}"
-
-        # Copy out build artifacts
-        docker run -it \
-               -v "${this_dir}/dist:/dist" \
-               -u "$(id -u):$(id -g)" \
-               "${docker_tag}" \
-               /bin/tar -czvf "/dist/mitlm-0.4.2-${friendly_arch}.tar.gz" /mitlm
     fi
+
+    # Copy out build artifacts
+    docker run -it \
+           -v "${this_dir}/dist:/dist" \
+           -u "$(id -u):$(id -g)" \
+           "${docker_tag}" \
+           /bin/tar -czvf "/dist/mitlm-0.4.2-${friendly_arch}.tar.gz" /mitlm
 
     # Alpine build
     docker_tag="rhasspy/mitlm:0.4.2-${friendly_arch}-alpine"
