@@ -11,14 +11,11 @@ RUN apt-get update && \
         build-essential \
         automake autoconf-archive gfortran libtool
 
-COPY download/mitlm-0.4.2-long.tar.gz /
-
-RUN cd / && tar -xvf /mitlm-0.4.2-long.tar.gz
+COPY download/mitlm-0.4.2/ /mitlm-0.4.2/
 
 # Build mitlm
 RUN cd /mitlm-0.4.2 && \
-    ./autogen.sh && \
-    ./configure --prefix=/build && \
+    ./autogen.sh --prefix=/build && \
     make -j $MAKE_THREADS && \
     make install
 
